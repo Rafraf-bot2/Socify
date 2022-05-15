@@ -78,9 +78,14 @@ app.get('/callback', async (req, res) => {
 
         if ('res' in resToken) {
             const resUser = await getUserInfo(resToken.res.access_token)
+            const rangeTerm = ["short_term", "medium_term", "long_term"]
+            const resTopA = []
+            for(i=0; i<rangeTerm.length; i++)
+                resTopA.push( await getCurrentUserTopArtists(resToken.res.access_token, rangeTerm[i]) )
+            const resTopArtist = await getCurrentUserTopArtists(resToken.res.access_token, "short_term")
 
             if ('res' in resUser)
-                await insertUserInDatabase(res, resUser.res, resToken.res)
+                await insertUserInDatabase(res, resUser.res, resToken.res, resTopA)
         }
     }
     res.redirect('http://localhost:3000/')

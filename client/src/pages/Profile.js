@@ -27,9 +27,11 @@ const Profile = () => {
 
             const userTopArtists = await getCurrentUserTopArtists("short_term");
             setTopArtists(userTopArtists);
+            console.log(userTopArtists)
 
             const userTopTracks = await getCurrentUserTopTracks("short_term");
             setTopTracks(userTopTracks);
+            console.log(userTopTracks)
 
             if (userTopTracks) {
                 const userStats = await getTracksAverageStats(userTopTracks.items);

@@ -14,11 +14,32 @@ const knex = require('knex')({
 
 const createDatabaseIfNotExist = async () => {
     if (!dbExist) {
+        await knex.schema.createTable('Artist', function (table) {
+            table.string('artistID').primary().notNullable()
+            table.string('name').notNullable()
+            table.string('image').notNullable()
+        })
+
+        await knex.schema.createTable('TopArtistList', function (table) {
+            table.primary(['listID', 'range'])
+            table.string('listID').notNullable()
+            table.string('range').notNullable()
+            
+
+            for(i=0; i<20; i++) {
+                table.string('artistID' + i)
+                table.foreign('artistID' + i).references('Artist.artistID')
+            }
+            table.foreign('listID').references('Users.userID')
+            
+        }) 
+
         await knex.schema.createTable('Users', function (table) {
             table.string('userID').primary().notNullable()
             table.string('name').notNullable()
             table.string('picture').notNullable()
             table.integer('lastDiscussion').notNullable()
+
         })
         await knex.schema.createTable('Friends', function (table) {
             table.string('userID').notNullable()
@@ -50,6 +71,7 @@ const createDatabaseIfNotExist = async () => {
             table.foreign('discussionID').references('Discussions.discussionID')
         })
 
+
         await knex('Discussions').insert({picture: 'https://i.scdn.co/image/ab6775700000ee85d0390b295b07f8a52a101767', name: 'Moi', type: false})
         await knex('Discussions').insert({picture: 'https://i.scdn.co/image/ab6775700000ee855067db235dd3330fd32360a4', name: 'Raf', type: true})
 
@@ -67,10 +89,12 @@ const createDatabaseIfNotExist = async () => {
     }
 }
 
-const insertUserInDatabase = async (res, userData, tokenData) => {
+const insertUserInDatabase = async (res, userData, tokenData, topArtistT) => {
     const currentTime = new Date()
     const expireTime = new Date(currentTime.getTime() + 55 * 60 * 1000)
     const picture = userData.images.length > 0 ? userData.images[0].url : ''
+    const listIDTab = ["1", "2", "3"]
+    const rangeTerm = ['short_term', 'medium_term', 'long_term']
 
     res.cookie('userID', userData.id, {signed: true})
     res.cookie('access_token', tokenData.access_token, {signed: true})
@@ -78,10 +102,42 @@ const insertUserInDatabase = async (res, userData, tokenData) => {
     res.cookie('expireTime', expireTime.toString(), {signed: true})
 
     const rows = await knex('Users').select('*').where('userID', '=', userData.id)
-
+    
     if (rows.length !== 1) {
-        await knex('Users').insert({userID: userData.id, name: userData.display_name, picture: picture, lastDiscussion: -1})
+        await knex('Users').insert({userID: userData.id, name: userData.display_name, 
+                picture: picture, lastDiscussion: -1})
+        for(i = 0; i < rangeTerm.length; i++) 
+            await knex('TopArtistList').insert({listID: userData.id, range: rangeTerm[i]}) 
+        fillTopArtistInDatabase(topArtistT, userData.id); 
+    
     }
+    const pipi = await knex('TopArtistList').select('*')
+}
+
+const fillTopArtistInDatabase = async (topArtist, listID) => {
+    const rangeTerm = ['short_term', 'medium_term', 'long_term']
+    
+    for(j=0; j< topArtist.length; j++) {
+        topArtistElement = topArtist[j].res.items
+
+        if(topArtistElement.length > 1) {
+            for(i = 0; i < topArtistElement.length; i++) {
+                await knex.raw('UPDATE TopArtistList SET artistID' + i + ' = ? WHERE listID = ? AND range = ?', [topArtistElement[i].id, listID, rangeTerm[j]])
+                const artistrow = await knex('Artist').select('*').where('artistID', '=', topArtistElement[i].id)
+                if(artistrow.length == 0)
+                    await knex('Artist').insert({artistID: topArtistElement[i].id, name: topArtistElement[i].name, image: topArtistElement[i].images[0].url})
+            }
+        }
+    }
+
+    //Log pour voir la bd touche pas mon pote tu va le regretter
+    /**
+     *      const pipi = await knex('TopArtistList').select('*')
+            console.log(pipi)
+            const caca = await knex('Artist').select('*')
+            console.log(caca)
+     */
+    
 }
 
 const insertMessageInDiscussion = async (discussionID, userID, content) => {
