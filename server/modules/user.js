@@ -72,7 +72,6 @@ const getCurrentUserTopArtists = async (access_token, time_range) => {
 
 const getCurrentUserTopTracks = async (access_token, time_range) => {
     //const time_range = 'short_term'
-
     const response = await axios.get(
         `/me/top/tracks?time_range=${time_range}`, {
         headers: {

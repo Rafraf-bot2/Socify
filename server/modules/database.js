@@ -20,11 +20,20 @@ const createDatabaseIfNotExist = async () => {
             table.string('image').notNullable()
         })
 
+        await knex.schema.createTable('Track', function (table) {
+            table.string('trackID').primary().notNullable()
+            table.string('name').notNullable()
+            table.string('image').notNullable()
+            table.string('artistName').notNullable()
+            table.string('albumName').notNullable()
+            table.string('duration').notNullable()
+
+        })
+
         await knex.schema.createTable('TopArtistList', function (table) {
             table.primary(['listID', 'range'])
             table.string('listID').notNullable()
             table.string('range').notNullable()
-            
 
             for(i=0; i<20; i++) {
                 table.string('artistID' + i)
@@ -33,6 +42,19 @@ const createDatabaseIfNotExist = async () => {
             table.foreign('listID').references('Users.userID')
             
         }) 
+
+        await knex.schema.createTable('TopTrackList', function (table) {
+            table.primary(['ListID', 'range'])
+            table.string('listID').notNullable()
+            table.string('range').notNullable()
+
+            for(i=0; i<20; i++) {
+                table.string('trackID' + i)
+                table.foreign('trackID' + i).references('Track.trackID')
+            }
+
+            table.foreign('listID').references('Users.userID')
+        })
 
         await knex.schema.createTable('Users', function (table) {
             table.string('userID').primary().notNullable()
@@ -89,11 +111,10 @@ const createDatabaseIfNotExist = async () => {
     }
 }
 
-const insertUserInDatabase = async (res, userData, tokenData, topArtistT) => {
+const insertUserInDatabase = async (res, userData, tokenData, topArtistT, topTrackT) => {
     const currentTime = new Date()
     const expireTime = new Date(currentTime.getTime() + 55 * 60 * 1000)
     const picture = userData.images.length > 0 ? userData.images[0].url : ''
-    const listIDTab = ["1", "2", "3"]
     const rangeTerm = ['short_term', 'medium_term', 'long_term']
 
     res.cookie('userID', userData.id, {signed: true})
@@ -102,16 +123,18 @@ const insertUserInDatabase = async (res, userData, tokenData, topArtistT) => {
     res.cookie('expireTime', expireTime.toString(), {signed: true})
 
     const rows = await knex('Users').select('*').where('userID', '=', userData.id)
-    
+    console.log(topTrackT[0].res.items[0].name)
     if (rows.length !== 1) {
         await knex('Users').insert({userID: userData.id, name: userData.display_name, 
                 picture: picture, lastDiscussion: -1})
-        for(i = 0; i < rangeTerm.length; i++) 
+        for(i = 0; i < rangeTerm.length; i++) {
             await knex('TopArtistList').insert({listID: userData.id, range: rangeTerm[i]}) 
+            await knex('TopTrackList').insert({listID: userData.id, range: rangeTerm[i]}) 
+        }
         fillTopArtistInDatabase(topArtistT, userData.id); 
+        fillTopTrackInDatabase(topTrackT, userData.id)
     
     }
-    const pipi = await knex('TopArtistList').select('*')
 }
 
 const fillTopArtistInDatabase = async (topArtist, listID) => {
@@ -139,6 +162,25 @@ const fillTopArtistInDatabase = async (topArtist, listID) => {
      */
     
 }
+
+const fillTopTrackInDatabase = async (topTrack, listID) => {
+    const rangeTerm = ['short_term', 'medium_term', 'long_term']
+
+    for(l = 0; l < topTrack.length; l++) {
+        topTrackElement = topTrack[l].res.items
+        if(topTrackElement.length > 1) {
+            for(k = 0; k < topTrackElement.length; k++) {
+                await knex.raw('UPDATE TopTrackList SET trackID' + k + ' = ? WHERE ListID = ? AND range = ?', [topTrackElement[k].id, listID, rangeTerm[l]])
+                const trackRow = await knex('Track').select('*').where('trackID', '=', topTrackElement[k].id)
+                if(trackRow.length == 0)
+                    await knex('Track').insert({trackID: topTrackElement[k].id, name: topTrackElement[k].name, 
+                                               image: topTrackElement[k].album.images[2].url, artistName: topTrackElement[k].artists[0].name,
+                                               albumName: topTrackElement[k].album.name, duration: topTrackElement[k].duration_ms})
+            }
+        }
+    }
+}
+
 
 const insertMessageInDiscussion = async (discussionID, userID, content) => {
     let message = {date: (new Date()).toString()}
