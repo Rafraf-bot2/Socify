@@ -32,11 +32,11 @@ export const getTracksAverageStats = async (tracks) => {
         }
     }
 
-    averageStats.set('Acoustique', (tabAcousticness.length !== 0) ? average(tabAcousticness).toFixed(2) * 100 + '%' : '0%')
-    averageStats.set('Dansabilité', (tabDanceability.length !== 0)  ? average(tabDanceability).toFixed(2) * 100 + '%' : '0%')
-    averageStats.set('Énergie',  (tabEnergy.length !== 0) ? average(tabEnergy).toFixed(2) * 100 + '%' : '0%')
-    averageStats.set('Instrumentalité', (tabInstrumentalness.length !== 0) ? average(tabInstrumentalness).toFixed(2) * 100 + '%' : '0%')
-    averageStats.set('Valence', (tabValence.length !== 0) ? average(tabValence).toFixed(2) * 100 + '%' : '0%')
+    averageStats.set('Acoustique', (tabAcousticness.length !== 0) ?  parseInt(average(tabAcousticness) * 100)  + '%' : '0%')
+    averageStats.set('Dansabilité', (tabDanceability.length !== 0)  ? parseInt(average(tabDanceability) * 100)  + '%' : '0%')
+    averageStats.set('Énergie',  (tabEnergy.length !== 0) ? parseInt(average(tabEnergy) * 100)  + '%' : '0%')
+    averageStats.set('Instrumentalité', (tabInstrumentalness.length !== 0) ? parseInt(average(tabInstrumentalness) * 100) + '%' : '0%')
+    averageStats.set('Valence', (tabValence.length !== 0) ? parseInt(average(tabValence) * 100) + '%' : '0%')
     
     return averageStats
 }

@@ -1,13 +1,18 @@
 const { createDatabaseIfNotExist, insertUserInDatabase, insertMessageInDiscussion, getDiscussionsByUserID, getDiscussionUsers } = require('./modules/database')
 const { getArtistTopTracks, getTracksInfo, getPlaylistByID } = require('./modules/music')
 const { checkIfTokenIsExpired, getAccessToken } = require('./modules/token')
-const { getUserInfo, getCurrentUserPlaylists, getCurrentUserTopArtists, getCurrentUserTopTracks, setCurrentUserPlaylist, fillCurrentUserPlaylist, getUserLastDiscussion, getUserDiscussions, getUserDiscussionMessages, setUserLastDiscussion } = require('./modules/user')
+const { getUserInfo, getCurrentUserPlaylists, getCurrentUserTopArtists, 
+        getCurrentUserTopTracks, setCurrentUserPlaylist, fillCurrentUserPlaylist, 
+        getUserLastDiscussion, getUserDiscussions, getUserDiscussionMessages, 
+        setUserLastDiscussion, getUser, getTArtist, 
+        getTTrack } = require('./modules/user')
 
 const express = require('express')
 const cors = require ('cors')
 const cookieParser = require('cookie-parser')
 const { encryptCookieNodeMiddleware, decryptCookieSocketMiddleware } = require('encrypt-cookie')
 const { URLSearchParams } = require('url')
+const { time } = require('console')
 
 require('dotenv').config()
 
@@ -244,6 +249,50 @@ app.post('/playlists/playlistID', async (req, res) => {
             error: 'Error'
         })
     }
+})
+
+app.get('/bd/user', async(req, res) => {
+    if('userID' in req.query) {
+        const response = await getUser(req.query.userID)
+        res.json(response)
+    } else 
+        res.json({ error : 'Error man'})
+})
+
+app.get('/bd/top/artist', async (req, res) => {
+    console.log(req.query)
+    if ('userID' in req.query){
+        const userID = req.query.userID
+        if ('time_range' in req.query) {
+             time_range = req.query.time_range
+        } else {
+             time_range = 'short_term'
+        }
+
+        const response = await getTArtist(userID, time_range)
+        res.json(response)
+    } else {
+        res.json({ error: 'caca'})
+    } 
+        
+})
+
+app.get('/bd/top/track', async (req, res) => {
+    console.log(req.query)
+    if ('userID' in req.query){
+        const userID = req.query.userID
+        if ('time_range' in req.query) {
+             time_range = req.query.time_range
+        } else {
+             time_range = 'short_term'
+        }
+
+        const response = await getTTrack(userID, time_range)
+        res.json(response)
+    } else {
+        res.json({ error: 'caca'})
+    } 
+        
 })
 
 app.get('/lastDiscussion', async (req, res) => {

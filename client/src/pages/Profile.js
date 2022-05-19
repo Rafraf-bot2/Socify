@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getCurrentUserProfile, getCurrentUserPlaylists, getCurrentUserTopArtists, getCurrentUserTopTracks } from '../scripts/user';
+import {getUser, getUserTArtist, getUserTTrack} from '../scripts/database';
 import { getTracksAverageStats } from '../scripts/music';
 import { StyledHeader, StyledButton, StyledLogoutButton } from '../styles';
 import { SectionWrapper, ArtistGrid, TrackList, PlaylistsGrid, StatGrid } from '../components';
@@ -12,6 +13,9 @@ const Profile = () => {
     const [topArtists, setTopArtists] = useState(null);
     const [topTracks, setTopTracks] = useState(null);
     const [stats, setStats] = useState(null);
+    const [user, setUser] = useState(null)
+    const [tArtist, setTArtist] = useState(null);
+    const [tTrack, setTTrack] = useState(null);
 
     useEffect(() => {
         /**
@@ -27,11 +31,21 @@ const Profile = () => {
 
             const userTopArtists = await getCurrentUserTopArtists("short_term");
             setTopArtists(userTopArtists);
-            console.log(userTopArtists)
 
             const userTopTracks = await getCurrentUserTopTracks("short_term");
             setTopTracks(userTopTracks);
-            console.log(userTopTracks)
+
+            const userInf = await getUser("kryserz")
+            setUser(userInf)
+            console.log(userInf)
+            
+            const userTArtist = await getUserTArtist("kryserz", "long_term")
+            setTArtist(userTArtist)
+            console.log(userTArtist)
+
+            const userTTrack = await getUserTTrack("kryserz", "long_term")
+            setTTrack(userTTrack)
+            console.log(userTTrack)
 
             if (userTopTracks) {
                 const userStats = await getTracksAverageStats(userTopTracks.items);

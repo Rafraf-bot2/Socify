@@ -1,3 +1,4 @@
+const { time } = require('console')
 const fs = require('fs')
 const { parseDate } = require('./common')
 
@@ -23,6 +24,7 @@ const createDatabaseIfNotExist = async () => {
         await knex.schema.createTable('Track', function (table) {
             table.string('trackID').primary().notNullable()
             table.string('name').notNullable()
+            table.string('uri').notNullable()
             table.string('image').notNullable()
             table.string('artistName').notNullable()
             table.string('albumName').notNullable()
@@ -123,7 +125,6 @@ const insertUserInDatabase = async (res, userData, tokenData, topArtistT, topTra
     res.cookie('expireTime', expireTime.toString(), {signed: true})
 
     const rows = await knex('Users').select('*').where('userID', '=', userData.id)
-    console.log(topTrackT[0].res.items[0].name)
     if (rows.length !== 1) {
         await knex('Users').insert({userID: userData.id, name: userData.display_name, 
                 picture: picture, lastDiscussion: -1})
@@ -135,6 +136,8 @@ const insertUserInDatabase = async (res, userData, tokenData, topArtistT, topTra
         fillTopTrackInDatabase(topTrackT, userData.id)
     
     }
+
+    //console.log(await getTopArtistsFromDB(userData.id, 'short_term'))
 }
 
 const fillTopArtistInDatabase = async (topArtist, listID) => {
@@ -161,6 +164,7 @@ const fillTopArtistInDatabase = async (topArtist, listID) => {
             console.log(caca)
      */
     
+    
 }
 
 const fillTopTrackInDatabase = async (topTrack, listID) => {
@@ -174,11 +178,38 @@ const fillTopTrackInDatabase = async (topTrack, listID) => {
                 const trackRow = await knex('Track').select('*').where('trackID', '=', topTrackElement[k].id)
                 if(trackRow.length == 0)
                     await knex('Track').insert({trackID: topTrackElement[k].id, name: topTrackElement[k].name, 
-                                               image: topTrackElement[k].album.images[2].url, artistName: topTrackElement[k].artists[0].name,
-                                               albumName: topTrackElement[k].album.name, duration: topTrackElement[k].duration_ms})
+                                               uri:topTrackElement[k].uri, image: topTrackElement[k].album.images[2].url, 
+                                               artistName: topTrackElement[k].artists[0].name, albumName: topTrackElement[k].album.name, 
+                                               duration: topTrackElement[k].duration_ms})
             }
         }
     }
+}
+
+const getUserFromDB = async(userID) => {
+   return (await knex.raw('SELECT * FROM Users WHERE userID = \'' + userID + '\' '))[0]
+}
+
+const getTopArtistsFromDB = async (userID, time_range) => {
+    const topArtistList = Object.values((await knex.raw('SELECT * FROM TopArtistList WHERE range = \'' 
+                                                        + time_range + '\' AND listID = \'' + userID +'\''))[0])
+    artistDetails = []
+
+    for(let i = 2; i < topArtistList.length; i++)
+        artistDetails.push(await knex('Artist').select('*').where('artistID', '=', topArtistList[i]).andWhere('artistID', '!=', 'null'))
+
+    return artistDetails
+}
+
+const getTopTrackFromDB = async(userID, time_range) => {
+    const topTrackList = Object.values((await knex.raw('SELECT * FROM TopTrackList WHERE range = \'' 
+                                                        + time_range + '\' AND listID = \'' + userID +'\''))[0])
+    trackDetails = []
+
+    for(let i = 2; i < topTrackList.length; i++)
+        trackDetails.push(await knex('Track').select('*').where('trackID', '=', topTrackList[i]).andWhere('trackID', '!=', 'null'))
+    
+    return trackDetails
 }
 
 
@@ -263,4 +294,8 @@ const setLastDiscussionByUserID = async (userID, lastDiscussion) => {
     await knex.raw('UPDATE Users SET lastDiscussion = ? WHERE userID = ?', [lastDiscussion, userID])
 }
 
-module.exports = { createDatabaseIfNotExist, insertUserInDatabase, insertMessageInDiscussion, getLastDiscussionByUserID, getDiscussionsByUserID, getMessagesByDiscussionID, getDiscussionUsers, setLastDiscussionByUserID }
+module.exports = { createDatabaseIfNotExist, insertUserInDatabase, insertMessageInDiscussion, 
+    getLastDiscussionByUserID, getDiscussionsByUserID, getMessagesByDiscussionID, 
+    getDiscussionUsers, setLastDiscussionByUserID, getTopArtistsFromDB, 
+    getTopTrackFromDB, getUserFromDB, fillTopArtistInDatabase,
+    fillTopTrackInDatabase, }

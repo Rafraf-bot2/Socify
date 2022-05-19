@@ -1,9 +1,20 @@
-const { getLastDiscussionByUserID, getDiscussionsByUserID, getMessagesByDiscussionID, setLastDiscussionByUserID } = require('./database')
+const { getLastDiscussionByUserID, getDiscussionsByUserID, getMessagesByDiscussionID, 
+        setLastDiscussionByUserID, getTopArtistsFromDB, 
+        getTopTrackFromDB, getUserFromDB  } = require('./database')
 
 const axios = require('axios').default
 
 axios.defaults.baseURL = 'https://api.spotify.com/v1'
 axios.defaults.headers['Content-Type'] = 'application/json'
+
+const knex = require('knex')({
+    client: 'sqlite3',
+    connection: {
+        filename: process.env.DB_PATH
+    },
+    useNullAsDefault: true
+})
+
 
 const getUserInfo = async (access_token) => {
     const response = await axios.get('/me', {
@@ -21,6 +32,8 @@ const getUserInfo = async (access_token) => {
             error: err
         }
     })
+
+    
 
     return response
 }
@@ -43,7 +56,6 @@ const getCurrentUserPlaylists = async (access_token) => {
             error: err
         }
     })
-
     return response
 }
 
@@ -159,4 +171,19 @@ const setUserLastDiscussion = async (userID, discussionID) => {
     return await setLastDiscussionByUserID(userID, discussionID)
 }
 
-module.exports = { getUserInfo, getCurrentUserPlaylists, getCurrentUserTopArtists, getCurrentUserTopTracks, setCurrentUserPlaylist, fillCurrentUserPlaylist, getUserLastDiscussion, getUserDiscussions, getUserDiscussionMessages, setUserLastDiscussion }
+const getUser = async(userID) => {
+    return await getUserFromDB(userID)
+}
+const getTArtist = async (userID, time_range) => {
+    return await getTopArtistsFromDB(userID, time_range)
+   }
+
+const getTTrack = async(userID, time_range) => {
+    return await getTopTrackFromDB(userID, time_range)
+}
+
+module.exports = { getUserInfo, getCurrentUserPlaylists, getCurrentUserTopArtists, 
+                   getCurrentUserTopTracks, setCurrentUserPlaylist, fillCurrentUserPlaylist, 
+                   getUserLastDiscussion, getUserDiscussions, getUserDiscussionMessages, 
+                   setUserLastDiscussion, getUser, getTArtist, 
+                   getTTrack }
