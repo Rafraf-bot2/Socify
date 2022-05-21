@@ -12,7 +12,7 @@ const { getUserInfo, getCurrentUserPlaylists, getCurrentUserTopArtists,
     getUserLastDiscussion, getUserDiscussions, getUserDiscussionMessages,
     getDiscussionUsersStatus, getUserDiscussionScrollPosition, setUserLastDiscussion,
     setUserDiscussionScrollPosition, getUser, getTArtist, 
-    getTTrack, getOthers, getFollowed } = require('./modules/user')
+    getTTrack, getOthers, getFollowed, getFollower } = require('./modules/user')
 
 const express = require('express')
 const cors = require ('cors')
@@ -310,7 +310,6 @@ app.get('/bd/user', async(req, res) => {
 })
 
 app.get('/bd/top/artist', async (req, res) => {
-    console.log(req.query)
     if ('userID' in req.query){
         const userID = req.query.userID
         if ('time_range' in req.query) {
@@ -328,7 +327,7 @@ app.get('/bd/top/artist', async (req, res) => {
 })
 
 app.get('/bd/top/track', async (req, res) => {
-    console.log(req.query)
+
     if ('userID' in req.query){
         const userID = req.query.userID
         if ('time_range' in req.query) {
@@ -359,9 +358,17 @@ app.get('/bd/followed', async (req, res) => {
     const userID = req.signedCookies ? req.signedCookies.userID : null
     if(userID) {
         const response = await getFollowed(userID)
-        console.log(response)
         res.json(response)
     } else  
+        res.json({ error: 'Error'})
+})
+
+app.get('/bd/follower', async (req, res) => {
+    const userID = req.signedCookies ? req.signedCookies.userID : null
+    if(userID) {
+        const response = await getFollower(userID)
+        res.json(response)
+    } else 
         res.json({ error: 'Error'})
 })
 

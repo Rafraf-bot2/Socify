@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getCurrentUserProfile, getCurrentUserPlaylists} from '../scripts/user';
-import {getCurrentUser, getCurrentUserTArtist, getCurrentUserTTrack, getOtherUsers, getFollowedUsers} from '../scripts/database';
+import {getCurrentUserPlaylists} from '../scripts/user';
+import {getCurrentUser, getCurrentUserTArtist, getCurrentUserTTrack, getOtherUsers, getFollowedUsers, getFollowerUsers} from '../scripts/database';
 import { getTracksAverageStats } from '../scripts/music';
 import { StyledHeader, StyledButton, StyledLogoutButton } from '../styles';
 import { SectionWrapper, ArtistGrid, TrackList, PlaylistsGrid, StatGrid, UserGrid } from '../components';
@@ -8,7 +8,6 @@ import { catchErrors } from '../utils';
 import socifyDefault from '../images/socifyDefault.png'
 
 const Profile = () => {
-    const [profile, setProfile] = useState(null);
     const [playlists, setPlaylists] = useState(null);
     const [stats, setStats] = useState(null);
     const [user, setUser] = useState(null)
@@ -16,6 +15,7 @@ const Profile = () => {
     const [tTrack, setTTrack] = useState(null);
     const [otherUsers, setOtherUSers] = useState(null);
     const [followedInfo, setFollowedInfo] = useState(null)
+    const [followerInfo, setFollowerInfo] = useState(null)
 
     useEffect(() => {
         /**
@@ -23,9 +23,6 @@ const Profile = () => {
         * https://github.com/facebook/react/issues/14326
         */
         const fetchData = async () => {
-            const userProfile = await getCurrentUserProfile();
-            setProfile(userProfile);
-
             const userPlaylists = await getCurrentUserPlaylists();
             setPlaylists(userPlaylists);
 
@@ -43,8 +40,11 @@ const Profile = () => {
             setOtherUSers(others)
 
             const followed = await getFollowedUsers()
-            console.log(followed)
             setFollowedInfo(followed)
+            
+            const follower = await getFollowerUsers();
+            console.log(follower)
+            setFollowerInfo(follower)
             
             if (userTTrack && userTTrack[0].length > 0) {
                 const userStats = await getTracksAverageStats(userTTrack);
@@ -60,7 +60,7 @@ const Profile = () => {
         <>
             <StyledButton href="/dashboard">Rooms</StyledButton>
             <StyledLogoutButton href="http://localhost:8000/logout">Se déconnecter</StyledLogoutButton>
-            {user && followedInfo && (
+            {user && (
                 <>
                     <StyledHeader type="user">
                         <div className="header_inner">
@@ -75,15 +75,25 @@ const Profile = () => {
                                             {playlists.total} Playlist{playlists.total > 1 ? 's' : ''}
                                         </span>
                                     )}
+
+                                    {followedInfo && (
+                                        <span>
+                                            {followedInfo.nbrFollowed} Followed
+                                        </span>
+                                    )}
+
+                                    {followerInfo && (
                                     <span>
-                                        {followedInfo.nbrFollowed} Followed
+                                        {followerInfo.nbrFollower} Follower{followerInfo.nbrFollower > 1 ? 's' : ''}
                                     </span>
+                                    )}
+
                                 </p>
                             </div>
                         </div>
                     </StyledHeader>
                     {
-                        tArtist && tTrack && otherUsers && followedInfo && (
+                        tArtist && tTrack && otherUsers && followedInfo && followerInfo && (
                             <main>
                                 <SectionWrapper title="📊 Stats">
                                     <StatGrid stats={stats}/>
@@ -96,15 +106,19 @@ const Profile = () => {
                                     <TrackList tracks={tTrack.slice(0, 5)}/>
                                 </SectionWrapper>
 
-                                <SectionWrapper title="Playlists" seeAllLink="/playlists">
+                                <SectionWrapper title="🎧 Playlists" seeAllLink="/playlists">
                                     <PlaylistsGrid playlists={playlists.items.slice(0,5)}/>
                                 </SectionWrapper>
                                 
-                                <SectionWrapper title="Followed" seeAllLink="/followed">
+                                <SectionWrapper title="😉 Followed" seeAllLink="/followed">
                                     <UserGrid users={followedInfo.userFollowed.slice(0, 5)}/>
                                 </SectionWrapper>
 
-                                <SectionWrapper title="Utilisateurs" seeAllLink="/users">
+                                <SectionWrapper title="🥵 Followers" seeAllLink="/follower">
+                                    <UserGrid users={followerInfo.userFollower.slice(0, 5)}/>
+                                </SectionWrapper>
+
+                                <SectionWrapper title="🧏‍♂️ Utilisateurs" seeAllLink="/users">
                                     <UserGrid users={otherUsers.slice(0, 5)}/>
                                 </SectionWrapper>
                             </main>

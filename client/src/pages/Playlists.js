@@ -25,7 +25,7 @@ const Playlists = () => {
             <StyledButton href="/">Home</StyledButton>
             <StyledLogoutButton href='http://localhost:8000/logout'>Se déconnecter</StyledLogoutButton>
             <main>
-                <SectionWrapper title="Playlists" breadcrumb={true}>
+                <SectionWrapper title="🎧 Playlists" breadcrumb={true}>
                     {playlists && (
                         <PlaylistsGrid playlists={playlists.items}/>
                     )}

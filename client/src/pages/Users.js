@@ -22,7 +22,7 @@ const Users = () => {
             <StyledButton href="/me">Home</StyledButton>
             <StyledLogoutButton href='http://localhost:8000/logout'>Se déconnecter</StyledLogoutButton>
             <main>
-                <SectionWrapper title ="Utilisateurs">
+                <SectionWrapper title ="🧏‍♂️ Utilisateurs">
                     <UserGrid users={otherUsers}/>
                 </SectionWrapper>
             </main>

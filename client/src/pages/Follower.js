@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
-import { getFollowedUsers } from '../scripts/database';
+import { getFollowerUsers } from '../scripts/database';
 import { catchErrors } from '../utils';
 import { StyledButton, StyledLogoutButton } from '../styles';
 import { SectionWrapper, UserGrid } from '../components';
 
-const Followed = () => {
-    const [followedUsers, setFollowedUsers] = useState(null);
+const Follower = () => {
+    const [followerUsers, setFollowerUsers] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
-            const followed = await getFollowedUsers()
-            console.log(followed)
-            setFollowedUsers(followed)
+            const follower = await getFollowerUsers()
+            console.log(follower)
+            setFollowerUsers(follower)
         }
 
         catchErrors(fetchData());
@@ -22,10 +22,10 @@ const Followed = () => {
             <StyledButton href="/me">Home</StyledButton>
             <StyledLogoutButton href='http://localhost:8000/logout'>Se déconnecter</StyledLogoutButton>
             <main>
-                <SectionWrapper title ="😉 Followed">
+                <SectionWrapper title ="🥵 Follower">
                     {
-                        followedUsers && (
-                            <UserGrid users={followedUsers.userFollowed}/>
+                        followerUsers && (
+                            <UserGrid users={followerUsers.userFollower}/>
                         )
                     }  
                 </SectionWrapper>
@@ -36,4 +36,4 @@ const Followed = () => {
     )
 
 }
-export default Followed;
+export default Follower;

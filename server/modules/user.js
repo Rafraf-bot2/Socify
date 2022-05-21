@@ -1,7 +1,8 @@
 const { getLastDiscussionByUserID, getDiscussionsByUserID, getMessagesByDiscussionID,
     getDiscussionUsersByDiscussionID, getDiscussionScrollPositionByUserIDAndByDiscussionID, setLastDiscussionByUserID,
     setDiscussionScrollPositionByUserIDAndByDiscussionID, getTopArtistsFromDB, getTopTrackFromDB,
-    getUserFromDB, getOtherUsersFromDB, getFollowedUsers } = require('./database')
+    getUserFromDB, getOtherUsersFromDB, getFollowedUsers,
+    getFollowersUsers } = require('./database')
 
 const axios = require('axios').default
 
@@ -213,10 +214,14 @@ const getOthers = async(userID) => {
 const getFollowed = async (userID) => {
     return await getFollowedUsers(userID)
 }
+const getFollower = async(userID) => {
+    return await getFollowersUsers(userID)
+} 
 
 module.exports = { getUserInfo, getCurrentUserPlaylists, getCurrentUserTopArtists,
     getCurrentUserTopTracks, setCurrentUserPlaylist, fillCurrentUserPlaylist,
     getUserLastDiscussion, getUserDiscussions, getUserDiscussionMessages,
     getDiscussionUsersStatus, getUserDiscussionScrollPosition, setUserLastDiscussion,
     setUserDiscussionScrollPosition, getUser, getTArtist, 
-    getTTrack, getOthers, getFollowed  }
+    getTTrack, getOthers, getFollowed, 
+    getFollower  }
