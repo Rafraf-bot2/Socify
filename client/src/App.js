@@ -7,7 +7,7 @@ import {
     Navigate
 } from 'react-router-dom'
 import { GlobalStyle } from './styles';
-import { Login, Profile, OtherUser, TopArtists, TopTracks, Playlists, Playlist, Dashboard, Users } from './pages';
+import { Login, Profile, OtherUser, TopArtists, TopTracks, Playlists, Playlist, Dashboard, Users, Followed } from './pages';
 
 
 /**
@@ -56,6 +56,7 @@ function App() {
                                 <Route path='/me' element={<Profile/>}/>
                                 <Route path='/user/:userID' element={<OtherUser/>}/>
                                 <Route path="/users" element={<Users/>}/>
+                                <Route path="/followed" element={<Followed/>}/>
                                 <Route path="/" element={<Navigate replace to="/me"/>}/>
                                 <Route path="*" element={<Navigate replace to="/"/>}/>
                             </Routes>

@@ -59,3 +59,9 @@ export const getOtherUsers = async () => {
     const response = await axios.get('/bd/others')
     return response.data
 }
+
+export const getFollowedUsers = async () => {
+    const response = await axios.get('/bd/followed')
+    console.log(response.data)
+    return response.data
+}

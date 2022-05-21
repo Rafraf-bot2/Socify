@@ -21,7 +21,6 @@ const TopTracks = () => {
         const fetchData = async () => {            
             const userInf = await getUser(userID)
             setUser(userInf)
-            console.log(userID)
 
             const userTTrack = await getUserTTrack(userID, `${activeRange}_term`)
             setTTrack(userTTrack)
@@ -31,12 +30,10 @@ const TopTracks = () => {
 
     let j = 0
     if(tTrack) {
-        console.log(tTrack)
         for(j=0; j < tTrack.length ; j++) {
             if(!(tTrack[j])[0])
                 break;
         }
-        console.log(j)
     }
     
     return(
@@ -44,10 +41,15 @@ const TopTracks = () => {
             <StyledButton href="/me">Home</StyledButton>
             <StyledLogoutButton href='http://localhost:8000/logout'>Se déconnecter</StyledLogoutButton>
             <main>
-                <SectionWrapper title='🚀 Top Sons' breadcrumb={true}>
-                    <RangeButton activeRange={activeRange} setActiveRange={setActiveRange}/>
-                    {tTrack && (<TrackList tracks={tTrack.slice(0, j)}/>)}
-                </SectionWrapper>
+                {
+                    user && (
+                        <SectionWrapper title={`🚀 ${user.name} Top Sons`} breadcrumb={true}>
+                            <RangeButton activeRange={activeRange} setActiveRange={setActiveRange}/>
+                            {tTrack && (<TrackList tracks={tTrack.slice(0, j)}/>)}
+                        </SectionWrapper>
+                    )
+                }
+
                 {tTrack && (
                 <PlaylistGenButton items={tTrack.slice(0, j)} type={'tracks'} profile={user} range={activeRange}/>)}
             </main>

@@ -10,3 +10,4 @@ export {default as Playlists} from './Playlists';
 export {default as Playlist} from './Playlist';
 export {default as Dashboard} from './Dashboard'; 
 export {default as Users} from './Users';
+export {default as Followed} from './Followed';

@@ -12,7 +12,7 @@ const { getUserInfo, getCurrentUserPlaylists, getCurrentUserTopArtists,
     getUserLastDiscussion, getUserDiscussions, getUserDiscussionMessages,
     getDiscussionUsersStatus, getUserDiscussionScrollPosition, setUserLastDiscussion,
     setUserDiscussionScrollPosition, getUser, getTArtist, 
-    getTTrack, getOthers } = require('./modules/user')
+    getTTrack, getOthers, getFollowed } = require('./modules/user')
 
 const express = require('express')
 const cors = require ('cors')
@@ -352,6 +352,16 @@ app.get('/bd/others', async (req, res) => {
         const response = await getOthers(userID)
         res.json(response)
     } else 
+        res.json({ error: 'Error'})
+})
+
+app.get('/bd/followed', async (req, res) => {
+    const userID = req.signedCookies ? req.signedCookies.userID : null
+    if(userID) {
+        const response = await getFollowed(userID)
+        console.log(response)
+        res.json(response)
+    } else  
         res.json({ error: 'Error'})
 })
 

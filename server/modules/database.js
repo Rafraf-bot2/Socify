@@ -129,6 +129,7 @@ const insertUserInDatabase = async (res, userData, tokenData, topArtistT, topTra
     }
 
     //console.log(await getTopTrackFromDB(userData.id, 'long_term'))
+    console.log (await getUsersWhoFollows(userData.id))
 }
 
 const fillTopArtistInDatabase = async (topArtist, listID) => {
@@ -209,6 +210,32 @@ const getOtherUsersFromDB = async(userID) => {
     const users = await knex('Users').select('*').where('userID', '!=', userID)
 
     return users
+}
+
+const getFollowedUsers = async(userID) => {
+    const followed = await getFollow(userID)
+    const nbrFollowed = followed.length
+    const userFollowed = []
+
+    for( i = 0; i < followed.length; i++) {
+        let user = await getUserFromDB(followed[i].userID)
+        userFollowed.push(user)
+    }
+
+    return {nbrFollowed, userFollowed}
+}
+
+const getUsersWhoFollows = async(userID) => {
+    const followed = await knex.select('followerID').from('Followers').where('userID', '=', userID)
+    const nbrFollowed = followed.length
+    const userFollowed = []
+
+    for( i = 0; i < followed.length; i++) {
+        let user = await getUserFromDB(followed[i].userID)
+        userFollowed.push(user)
+    }
+
+    return {nbrFollowed, userFollowed}
 }
 
 const insertMessageInDiscussion = async (discussionID, userID, content) => {
@@ -417,4 +444,5 @@ module.exports = { createDatabaseIfNotExist, insertUserInDatabase, insertMessage
     getFollow, getdiscussionOwner, getFollowID,
     getMessagesWaiting, setDiscussionLastView, checkIfUserInDiscussion,
     getTopArtistsFromDB, getTopTrackFromDB, getUserFromDB,
-    fillTopArtistInDatabase, fillTopTrackInDatabase, getOtherUsersFromDB }
+    fillTopArtistInDatabase, fillTopTrackInDatabase, getOtherUsersFromDB,
+    getFollowedUsers }

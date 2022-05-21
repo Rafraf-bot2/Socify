@@ -44,12 +44,16 @@ const TopArtists = () => {
             <StyledButton href="/me">Home</StyledButton>
             <StyledLogoutButton href='http://localhost:8000/logout'>Se déconnecter</StyledLogoutButton>
             <main>
-                <SectionWrapper title='🚀 Top Artistes' breadcrumb={true}>
-                    <RangeButton activeRange={activeRange} setActiveRange={setActiveRange}/>
-                    { tArtist && (<ArtistGrid artists={tArtist.slice(0, j)}/>) }
-                </SectionWrapper>
-                    {tArtist && user && (
-                <PlaylistGenButton items={tArtist.slice(0, j)} type={'artists'} profile={user} range={activeRange}/>)}
+                { user && (
+                    <SectionWrapper title={`🚀 ${user.name} Top Artistes`} breadcrumb={true}>
+                        <RangeButton activeRange={activeRange} setActiveRange={setActiveRange}/>
+                        { tArtist && (<ArtistGrid artists={tArtist.slice(0, j)}/>) }
+                    </SectionWrapper>
+                )
+
+                }
+                {tArtist && user && (
+                    <PlaylistGenButton items={tArtist.slice(0, j)} type={'artists'} profile={user} range={activeRange}/>)}
             </main>
         </>
         

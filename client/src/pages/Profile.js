@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getCurrentUserProfile, getCurrentUserPlaylists} from '../scripts/user';
-import {getCurrentUser, getCurrentUserTArtist, getCurrentUserTTrack, getOtherUsers} from '../scripts/database';
+import {getCurrentUser, getCurrentUserTArtist, getCurrentUserTTrack, getOtherUsers, getFollowedUsers} from '../scripts/database';
 import { getTracksAverageStats } from '../scripts/music';
 import { StyledHeader, StyledButton, StyledLogoutButton } from '../styles';
 import { SectionWrapper, ArtistGrid, TrackList, PlaylistsGrid, StatGrid, UserGrid } from '../components';
@@ -15,6 +15,7 @@ const Profile = () => {
     const [tArtist, setTArtist] = useState(null);
     const [tTrack, setTTrack] = useState(null);
     const [otherUsers, setOtherUSers] = useState(null);
+    const [followedInfo, setFollowedInfo] = useState(null)
 
     useEffect(() => {
         /**
@@ -30,26 +31,26 @@ const Profile = () => {
 
             const userInf = await getCurrentUser()
             setUser(userInf)
-            console.log(userInf.userID)
             
             const userTArtist = await getCurrentUserTArtist()
             setTArtist(userTArtist)
+            console.log(userTArtist)
 
             const userTTrack = await getCurrentUserTTrack()
             setTTrack(userTTrack)
 
             const others = await getOtherUsers()
             setOtherUSers(others)
-            console.log(others)
 
-            console.log('Ttrack', userTTrack)
-
+            const followed = await getFollowedUsers()
+            console.log(followed)
+            setFollowedInfo(followed)
+            
             if (userTTrack && userTTrack[0].length > 0) {
                 const userStats = await getTracksAverageStats(userTTrack);
                 setStats(userStats);
             } else
                 setStats(null);
-            
 
         };
         catchErrors(fetchData());
@@ -59,7 +60,7 @@ const Profile = () => {
         <>
             <StyledButton href="/dashboard">Rooms</StyledButton>
             <StyledLogoutButton href="http://localhost:8000/logout">Se déconnecter</StyledLogoutButton>
-            {user && (
+            {user && followedInfo && (
                 <>
                     <StyledHeader type="user">
                         <div className="header_inner">
@@ -75,14 +76,14 @@ const Profile = () => {
                                         </span>
                                     )}
                                     <span>
-                                        {profile.followers.total} Ami{profile.followers.total > 1 ? 's' : ''}
+                                        {followedInfo.nbrFollowed} Followed
                                     </span>
                                 </p>
                             </div>
                         </div>
                     </StyledHeader>
                     {
-                        tArtist && tTrack && otherUsers && (
+                        tArtist && tTrack && otherUsers && followedInfo && (
                             <main>
                                 <SectionWrapper title="📊 Stats">
                                     <StatGrid stats={stats}/>
@@ -98,6 +99,11 @@ const Profile = () => {
                                 <SectionWrapper title="Playlists" seeAllLink="/playlists">
                                     <PlaylistsGrid playlists={playlists.items.slice(0,5)}/>
                                 </SectionWrapper>
+                                
+                                <SectionWrapper title="Followed" seeAllLink="/followed">
+                                    <UserGrid users={followedInfo.userFollowed.slice(0, 5)}/>
+                                </SectionWrapper>
+
                                 <SectionWrapper title="Utilisateurs" seeAllLink="/users">
                                     <UserGrid users={otherUsers.slice(0, 5)}/>
                                 </SectionWrapper>
