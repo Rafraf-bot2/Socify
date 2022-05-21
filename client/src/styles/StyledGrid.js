@@ -35,6 +35,7 @@ list-style: none;
 
       &:hover,
       &:focus {
+        cursor: pointer;
         text-decoration: none;
       }
     }
