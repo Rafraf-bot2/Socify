@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { SectionWrapper, TrackList } from '../components';
+import { SectionWrapper, PlaylistTrackList } from '../components';
 import { getPlaylistByID } from '../scripts/music';
 import { StyledHeader, StyledButton, StyledLogoutButton } from '../styles';
 import { catchErrors } from '../utils';
@@ -51,9 +51,9 @@ const Playlist = () => {
                         </div>
                     </StyledHeader>
                     <main>
-                        <SectionWrapper title='Playlist' breacrumb={true}>
+                        <SectionWrapper title='Playlist' breadcrumb={true}>
                             {tracks && (
-                                <TrackList tracks={tracksOfTrackList}/>
+                                <PlaylistTrackList tracks={tracksOfTrackList}/>
                             )}
                         </SectionWrapper>
                     </main>
