@@ -4,6 +4,7 @@ import {
     Routes,
     Route,
     useLocation,
+    Navigate
 } from 'react-router-dom'
 import { GlobalStyle } from './styles';
 import { Login, Profile, OtherUser, TopArtists, TopTracks, Playlists, Playlist, Dashboard, Users } from './pages';
@@ -52,11 +53,11 @@ function App() {
                                 <Route path="/playlists/:id" element={<Playlist/>} />
                                 <Route path="/playlists" element={<Playlists/>} />
                                 <Route path="/dashboard" element={<Dashboard/>}/>
-                                <Route path="/" >
-                                    <Route path='me' element={<Profile/>}/>
-                                    <Route path=':userID' element={<OtherUser/>}/>
-                                </Route>
+                                <Route path='/me' element={<Profile/>}/>
+                                <Route path='/user/:userID' element={<OtherUser/>}/>
                                 <Route path="/users" element={<Users/>}/>
+                                <Route path="/" element={<Navigate replace to="/me"/>}/>
+                                <Route path="*" element={<Navigate replace to="/"/>}/>
                             </Routes>
                         </Router>
                     </>)

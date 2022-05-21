@@ -10,7 +10,7 @@
              <>
              <StyledGrid type='artist'>
                  {users.map((user, i) => (
-                     <a href={'/'+user.userID} target='_blank' key={i}>
+                     <a href={'/user/'+user.userID} target='_blank' key={i}>
                          <li className='grid_item' key={i} >
                             <div className='grid_item_inner'>
                                 <div className='grid_item_img'>

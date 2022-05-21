@@ -22,6 +22,7 @@ export const getTracksAverageStats = async (tracks) => {
 
     for (const track of tracks) {
         const infoTrack = await getTracksInfo(track[0].trackID)
+        
         if (infoTrack) {
             tabAcousticness.push(infoTrack.acousticness)
             tabDanceability.push(infoTrack.danceability)

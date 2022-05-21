@@ -22,7 +22,7 @@ const Playlists = () => {
 
     return (
         <>
-            <StyledButton href="/me">Home</StyledButton>
+            <StyledButton href="/">Home</StyledButton>
             <StyledLogoutButton href='http://localhost:8000/logout'>Se déconnecter</StyledLogoutButton>
             <main>
                 <SectionWrapper title="Playlists" breadcrumb={true}>
@@ -34,6 +34,5 @@ const Playlists = () => {
         </>
     )
 }
-
 
 export default Playlists;

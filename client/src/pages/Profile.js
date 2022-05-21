@@ -42,7 +42,9 @@ const Profile = () => {
             setOtherUSers(others)
             console.log(others)
 
-            if (userTTrack) {
+            console.log('Ttrack', userTTrack)
+
+            if (userTTrack && userTTrack[0].length > 0) {
                 const userStats = await getTracksAverageStats(userTTrack);
                 setStats(userStats);
             } else
@@ -52,6 +54,7 @@ const Profile = () => {
         };
         catchErrors(fetchData());
     }, []);
+
     return (
         <>
             <StyledButton href="/dashboard">Rooms</StyledButton>

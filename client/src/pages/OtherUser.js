@@ -17,13 +17,14 @@ const OtherUser = () => {
 
     const {userID} = useParams();
 
+    console.log(userID);
+
     useEffect(() => {
         /**
         * On crée une fct asynchrone pour ne pas rendre le hook useEffect asynchrone (sinon c'est le dawa)
         * https://github.com/facebook/react/issues/14326
         */
         const fetchData = async () => {
-
             const userInf = await getUser(userID)
             setUser(userInf)
             console.log(userInf.picture)

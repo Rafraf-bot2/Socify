@@ -1,20 +1,12 @@
-const { getLastDiscussionByUserID, getDiscussionsByUserID, getMessagesByDiscussionID, 
-        setLastDiscussionByUserID, getTopArtistsFromDB, 
-        getTopTrackFromDB, getUserFromDB, getOtherUsersFromDB  } = require('./database')
+const { getLastDiscussionByUserID, getDiscussionsByUserID, getMessagesByDiscussionID,
+    getDiscussionUsersByDiscussionID, getDiscussionScrollPositionByUserIDAndByDiscussionID, setLastDiscussionByUserID,
+    setDiscussionScrollPositionByUserIDAndByDiscussionID, getTopArtistsFromDB, getTopTrackFromDB,
+    getUserFromDB, getOtherUsersFromDB } = require('./database')
 
 const axios = require('axios').default
 
 axios.defaults.baseURL = 'https://api.spotify.com/v1'
 axios.defaults.headers['Content-Type'] = 'application/json'
-
-const knex = require('knex')({
-    client: 'sqlite3',
-    connection: {
-        filename: process.env.DB_PATH
-    },
-    useNullAsDefault: true
-})
-
 
 const getUserInfo = async (access_token) => {
     const response = await axios.get('/me', {
@@ -32,8 +24,6 @@ const getUserInfo = async (access_token) => {
             error: err
         }
     })
-
-    
 
     return response
 }
@@ -56,12 +46,11 @@ const getCurrentUserPlaylists = async (access_token) => {
             error: err
         }
     })
+
     return response
 }
 
 const getCurrentUserTopArtists = async (access_token, time_range) => {
-    //const time_range = 'short_term'
-
     const response = await axios.get(
         `/me/top/artists?time_range=${time_range}`, {
         headers: {
@@ -83,7 +72,6 @@ const getCurrentUserTopArtists = async (access_token, time_range) => {
 }
 
 const getCurrentUserTopTracks = async (access_token, time_range) => {
-    //const time_range = 'short_term'
     const response = await axios.get(
         `/me/top/tracks?time_range=${time_range}`, {
         headers: {
@@ -167,8 +155,44 @@ const getUserDiscussionMessages = async discussionID => {
     return await getMessagesByDiscussionID(discussionID)
 }
 
-const setUserLastDiscussion = async (userID, discussionID) => {
-    return await setLastDiscussionByUserID(userID, discussionID)
+const getDiscussionUsersStatus = async (discussionID, sockets) => {
+    let connectedUsers = []
+    let disconnectedUsers = []
+    let connectedUsersAll = []
+    for (const socket of sockets) {
+        connectedUsersAll.push(socket.userID)
+    }
+
+    const connectedUsersUnique = [...new Set(connectedUsersAll)]
+    const discussionUsers = await getDiscussionUsersByDiscussionID(discussionID)
+
+    discussionUsers.sort((user1, user2) => user1.name - user2.name)
+
+    for (const user of discussionUsers) {
+        if (connectedUsersUnique.includes(user.userID))
+            connectedUsers.push(user)
+        else
+            disconnectedUsers.push(user)
+    }
+
+    return {
+        res: {
+            connected: connectedUsers,
+            disconnected: disconnectedUsers,
+        }
+    }
+}
+
+const getUserDiscussionScrollPosition = async (userID, lastDiscussion) => {
+    return await getDiscussionScrollPositionByUserIDAndByDiscussionID(userID, lastDiscussion)
+}
+
+const setUserLastDiscussion = async (userID, lastDiscussion) => {
+    await setLastDiscussionByUserID(userID, lastDiscussion)
+}
+
+const setUserDiscussionScrollPosition = async (userID, discussionID, scrollPosition) => {
+    await setDiscussionScrollPositionByUserIDAndByDiscussionID(userID, discussionID, scrollPosition)
 }
 
 const getUser = async(userID) => {
@@ -186,8 +210,9 @@ const getOthers = async(userID) => {
     return await getOtherUsersFromDB(userID)
 }
 
-module.exports = { getUserInfo, getCurrentUserPlaylists, getCurrentUserTopArtists, 
-                   getCurrentUserTopTracks, setCurrentUserPlaylist, fillCurrentUserPlaylist, 
-                   getUserLastDiscussion, getUserDiscussions, getUserDiscussionMessages, 
-                   setUserLastDiscussion, getUser, getTArtist, 
-                   getTTrack, getOthers }
+module.exports = { getUserInfo, getCurrentUserPlaylists, getCurrentUserTopArtists,
+    getCurrentUserTopTracks, setCurrentUserPlaylist, fillCurrentUserPlaylist,
+    getUserLastDiscussion, getUserDiscussions, getUserDiscussionMessages,
+    getDiscussionUsersStatus, getUserDiscussionScrollPosition, setUserLastDiscussion,
+    setUserDiscussionScrollPosition, getUser, getTArtist, 
+    getTTrack, getOthers  }

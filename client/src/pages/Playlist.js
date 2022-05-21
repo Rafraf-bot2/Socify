@@ -30,6 +30,7 @@ const Playlist = () => {
         if (tracks)
             return tracks.map(({track}) => track);
     }, [tracks])
+    
     return (
         <>
             <StyledButton href="/me">Home</StyledButton>
