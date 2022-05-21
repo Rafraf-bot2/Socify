@@ -127,7 +127,7 @@ app.get('/me/playlists', async (req, res) => {
     res.json(response)
 })
 
-app.get('/me/top/artists', async (req, res) => {
+app.post('/me/top/artists', async (req, res) => {
     const exit = await checkIfTokenIsExpired(req, res)
     if (exit)
         return
@@ -145,7 +145,7 @@ app.get('/me/top/artists', async (req, res) => {
     }
 })
 
-app.get('/me/top/tracks', async (req, res) => {
+app.post('/me/top/tracks', async (req, res) => {
     const exit = await checkIfTokenIsExpired(req, res)
     if (exit)
         return

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { catchErrors } from '../utils'
 import { getCurrentUserProfile } from '../scripts/user'
 import { checkIfInDiscussion, checkIfFollowingUser, checkLastMessageDate, getCurrentUserLastDiscussion, getCurrentUserDiscussions, getCurrentUserDiscussionMessages, getDiscussionUsersStatus, getCurrentUserDiscussionScrollPosition, setCurrentUserLastDiscussion, setCurrentUserDiscussionScrollPosition,searchUsersAndDiscussions, followDiscussionUser, joinDiscussionUser, createDiscussion, getdiscussionsTrend, getCurrentUserFollow, getCurrentUserMessagesWaiting, setCurrentUserDiscussionLastView } from '../scripts/chat'
@@ -210,40 +210,41 @@ const Dashboard = () => {
         } else {
             setUsers([])
             setDiscussionsTrend(await getdiscussionsTrend())
+            setSearchResult(null)
         }
     }
 
-    const receiveMessage = useCallback(async data => {
-        if (currentDiscussion === data.discussionID) {
-            if (messages && messages.length > 0 && messages[messages.length - 1].messageID !== data.messageID) {
+    useEffect(() => {
+        if (socket === null)
+            return
+
+        const receiveMessage = async data => {
+            if (currentDiscussion === data.discussionID) {
                 setMessages((messages) => [...messages, data])
                 await setCurrentUserDiscussionLastView(currentDiscussion, data.rawDate)
+            } else {
+                setMessagesWaiting(await getCurrentUserMessagesWaiting())
             }
-            if (messages && messages.length === 0)
-                setMessages((messages) => [...messages, data])
-        } else {
-            setMessagesWaiting(await getCurrentUserMessagesWaiting())
         }
-    }, [currentDiscussion, messages, setMessages, setMessagesWaiting])
-
-    useEffect(() => {
-        if (socket === null)
-            return
         
         socket.on('receiveMessage', receiveMessage)
-    }, [socket, receiveMessage])
 
-    const receiveMessageDiscussion = useCallback(async data => {
-        setDiscussions(data.discussions)
-        setMessagesWaiting(await getCurrentUserMessagesWaiting())
-    }, [setDiscussions, setMessagesWaiting])
+        return () => socket.off('receiveMessage')
+    }, [socket, currentDiscussion, messages])
 
     useEffect(() => {
         if (socket === null)
             return
 
+        const receiveMessageDiscussion = async data => {
+            setDiscussions(data.discussions)
+            setMessagesWaiting(await getCurrentUserMessagesWaiting())
+        }
+
         socket.on('receiveMessageDiscussion', receiveMessageDiscussion)
-    }, [socket, receiveMessageDiscussion])
+
+        return () => socket.off('receiveMessageDiscussion')
+    }, [socket, discussions, messagesWaiting])
 
     useEffect(() => {
         const fetchData = async () => {

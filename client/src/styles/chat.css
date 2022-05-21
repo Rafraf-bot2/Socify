@@ -611,6 +611,16 @@
     border-radius: 20px;
 }
 
+.userResult .suit {
+    display: inline-block;
+    width: 29%;
+    vertical-align: middle;
+    font-size: 0.8vw;
+    border-radius: 20px;
+    background-color: #1db954;
+    cursor: default;
+}
+
 .discussionResult {
     margin-right: 1%;
 }

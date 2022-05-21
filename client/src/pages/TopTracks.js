@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getCurrentUserTopTracks, getCurrentUserProfile } from '../scripts/user';
 import {getUser, getUserTTrack} from '../scripts/database';
 import { TrackList, SectionWrapper, RangeButton } from '../components';
 import { PlaylistGenButton } from '../components';
@@ -9,9 +8,7 @@ import { StyledButton, StyledLogoutButton } from '../styles';
 
 const TopTracks = () => {
     const {userID} = useParams();
-    const [topTracks, setTopTracks] = useState(null);
     const [activeRange, setActiveRange] = useState('short');
-    const [profile, setProfile] = useState(null);
 
     const [user, setUser] = useState(null)
     const [tTrack, setTTrack] = useState(null);
@@ -21,13 +18,7 @@ const TopTracks = () => {
          * On crée une fct asynchrone pour ne pas rendre le hook useEffect asynchrone (sinon c'est le dawa)
          * https://github.com/facebook/react/issues/14326
          */
-        const fetchData = async () => {
-            const tracks = await getCurrentUserTopTracks(`${activeRange}_term`);
-            setTopTracks(tracks);
-
-            const userProfile = await getCurrentUserProfile();
-            setProfile(userProfile);
-            
+        const fetchData = async () => {            
             const userInf = await getUser(userID)
             setUser(userInf)
             console.log(userID)
