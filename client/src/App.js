@@ -6,7 +6,7 @@ import {
     useLocation,
 } from 'react-router-dom'
 import { GlobalStyle } from './styles';
-import { Login, Profile, TopArtists, TopTracks, Playlists, Playlist, Dashboard } from './pages';
+import { Login, Profile, OtherUser, TopArtists, TopTracks, Playlists, Playlist, Dashboard, Users } from './pages';
 
 
 /**
@@ -47,12 +47,16 @@ function App() {
                         <Router>
                             <ScrollToTop />
                             <Routes>
-                                <Route path="/top-artists" element={<TopArtists/>} />
-                                <Route path="/top-tracks" element={<TopTracks/>} />
+                                <Route path="/top-artists/:userID" element={<TopArtists/>} />
+                                <Route path="/top-tracks/:userID" element={<TopTracks/>} />
                                 <Route path="/playlists/:id" element={<Playlist/>} />
                                 <Route path="/playlists" element={<Playlists/>} />
                                 <Route path="/dashboard" element={<Dashboard/>}/>
-                                <Route path="/" element={<Profile/>}/>
+                                <Route path="/" >
+                                    <Route path='me' element={<Profile/>}/>
+                                    <Route path=':userID' element={<OtherUser/>}/>
+                                </Route>
+                                <Route path="/users" element={<Users/>}/>
                             </Routes>
                         </Router>
                     </>)

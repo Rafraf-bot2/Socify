@@ -138,6 +138,7 @@ const insertUserInDatabase = async (res, userData, tokenData, topArtistT, topTra
     }
 
     //console.log(await getTopArtistsFromDB(userData.id, 'short_term'))
+    console.log(await getOtherUsersFromDB(userData.id))
 }
 
 const fillTopArtistInDatabase = async (topArtist, listID) => {
@@ -210,6 +211,12 @@ const getTopTrackFromDB = async(userID, time_range) => {
         trackDetails.push(await knex('Track').select('*').where('trackID', '=', topTrackList[i]).andWhere('trackID', '!=', 'null'))
     
     return trackDetails
+}
+
+const getOtherUsersFromDB = async(userID) => {
+    const users = await knex('Users').select('*').where('userID', '!=', userID)
+
+    return users
 }
 
 
@@ -298,4 +305,4 @@ module.exports = { createDatabaseIfNotExist, insertUserInDatabase, insertMessage
     getLastDiscussionByUserID, getDiscussionsByUserID, getMessagesByDiscussionID, 
     getDiscussionUsers, setLastDiscussionByUserID, getTopArtistsFromDB, 
     getTopTrackFromDB, getUserFromDB, fillTopArtistInDatabase,
-    fillTopTrackInDatabase, }
+    fillTopTrackInDatabase, getOtherUsersFromDB}

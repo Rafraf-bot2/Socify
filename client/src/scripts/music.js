@@ -21,8 +21,7 @@ export const getTracksAverageStats = async (tracks) => {
     let averageStats = new Map() 
 
     for (const track of tracks) {
-        const infoTrack = await getTracksInfo(track.id)
-
+        const infoTrack = await getTracksInfo(track[0].trackID)
         if (infoTrack) {
             tabAcousticness.push(infoTrack.acousticness)
             tabDanceability.push(infoTrack.danceability)

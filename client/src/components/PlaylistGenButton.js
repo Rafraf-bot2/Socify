@@ -25,11 +25,11 @@ const PlaylistGenButton = ({items, type, profile, range}) => {
  */
 const GenereatePlaylistFromArtist = async (profile, items) => {
     let tracksUris = [];
-    let playlistName = `${profile.display_name} top artistes 🔥`;
-    let playlistDesc = `Les 5 top sons des 20 artistes préferés de ${profile.display_name}`; 
+    let playlistName = `${profile.name} top artistes 🔥`;
+    let playlistDesc = `Les 5 top sons des 20 artistes préferés de ${profile.name}`; 
 
-    for (const item of items) {
-        const tracks = await getArtistTopTracks(item.id);
+    for(let i=0; i<items.length; i++) {
+        const tracks = await getArtistTopTracks((items[i])[0].artistID);
         if (tracks) {
             const topTracks = tracks.tracks.slice(0, 5);
 
@@ -37,6 +37,15 @@ const GenereatePlaylistFromArtist = async (profile, items) => {
                 tracksUris.push(topTrack.uri)
         }
     }
+   /* for (const item of items) {
+        const tracks = await getArtistTopTracks(item.id);
+        if (tracks) {
+            const topTracks = tracks.tracks.slice(0, 5);
+
+            for (const topTrack of topTracks) 
+                tracksUris.push(topTrack.uri)
+        }
+    } */
 
     return {playlistName, playlistDesc, tracksUris}
 }
@@ -49,12 +58,12 @@ const GenereatePlaylistFromArtist = async (profile, items) => {
  */
 const GenereatePlaylistFromTrack = async (profile, items) => {
     const tracksUris = [];
-    let playlistName = `${profile.display_name} top sons 🔥`;
-    let playlistDesc = `Les 20 sons les plus écoutés de ${profile.display_name}`; 
+    let playlistName = `${profile.name} top sons 🔥`;
+    let playlistDesc = `Les 20 sons les plus écoutés de ${profile.name}`; 
     
-    for(const item of items)
-        tracksUris.push(item.uri)
-    
+    for(let i=0; i<items.length; i++) {
+        tracksUris.push((items[0])[0].uri)
+    }
     return {playlistName, playlistDesc, tracksUris}
 }
 

@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
-import { getCurrentUserTopArtists, getCurrentUserProfile } from '../scripts/user';
+import { useParams } from 'react-router-dom';
+import {getUser, getUserTArtist} from '../scripts/database';
 import { ArtistGrid, SectionWrapper, RangeButton, PlaylistGenButton } from '../components';
 import { catchErrors } from '../utils';
 import { StyledButton, StyledLogoutButton } from '../styles';
 
 const TopArtists = () => {
-    const [topArtists, setTopArtists] = useState(null);
+    const {userID} = useParams();
     const [activeRange, setActiveRange] = useState('short');
-    const [profile, setProfile] = useState(null);
+
+    const [user, setUser] = useState(null)
+    const [tArtist, setTArtist] = useState(null);
 
     useEffect (() => {
          /**
@@ -15,26 +18,38 @@ const TopArtists = () => {
         * https://github.com/facebook/react/issues/14326
         */
         const fetchData = async () => {
-            const artists = await getCurrentUserTopArtists(`${activeRange}_term`);
-            setTopArtists(artists);
 
-            const userProfile = await getCurrentUserProfile();
-            setProfile(userProfile);
+            const userInf = await getUser(userID)
+            setUser(userInf)
+            console.log(userInf.picture)
+            
+            const userTArtist = await getUserTArtist(userID, `${activeRange}_term`)
+            setTArtist(userTArtist)
+            console.log(userTArtist)
         };
         catchErrors(fetchData());
-    }, [activeRange]);
-
+    }, [activeRange, userID]);
+    let j = 0
+    if(tArtist) {
+        
+        console.log(tArtist)
+        for(j=0; j < tArtist.length ; j++) {
+            if(!(tArtist[j])[0])
+                break;
+        }
+        console.log(j)
+    }
     return (
         <>
-            <StyledButton href="/">Home</StyledButton>
+            <StyledButton href="/me">Home</StyledButton>
             <StyledLogoutButton href='http://localhost:8000/logout'>Se déconnecter</StyledLogoutButton>
             <main>
                 <SectionWrapper title='🚀 Top Artistes' breadcrumb={true}>
                     <RangeButton activeRange={activeRange} setActiveRange={setActiveRange}/>
-                    { topArtists && topArtists.items && (<ArtistGrid artists={topArtists.items}/>) }
+                    { tArtist && (<ArtistGrid artists={tArtist.slice(0, j)}/>) }
                 </SectionWrapper>
-                    {topArtists && topArtists.items && (
-                <PlaylistGenButton items={topArtists.items} type={'artists'} profile={profile} range={activeRange}/>)}
+                    {tArtist && user && (
+                <PlaylistGenButton items={tArtist.slice(0, j)} type={'artists'} profile={user} range={activeRange}/>)}
             </main>
         </>
         

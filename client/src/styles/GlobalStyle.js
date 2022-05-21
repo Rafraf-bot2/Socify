@@ -45,13 +45,15 @@ p {
 a, button {
     transition: all 0.3s ease;
     color: inherit;
+    text-decoration: none;
 }
 
 a {
     text-decoration: none;
-
+    color: inherit;
     &:hover, &:focus {
         text-decoration: underline;
+        color: inherit;
     } 
 }
 

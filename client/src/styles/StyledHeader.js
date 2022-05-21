@@ -41,10 +41,12 @@ const StyledHeader = styled.header`
   }
 
   img.header_img {
-    width: 20%;
-    max-width: 250px;
-    min-width: 120px;
+    object-fit: cover;
+  border-radius: 50%;
+  height: 200px;
+  width: 200px;
     margin-right: var(--spacing-lg);
+    object-fit: cover;
     box-shadow: 0 4px 60px rgb(0 0 0 / 50%);
     background-color: var(--dark-grey);
 
@@ -52,8 +54,7 @@ const StyledHeader = styled.header`
        Si c'est le cas on met la border-radius à 50%
        (On fait ça car on va utiliser Styled Header avec des component un peu différents)
     */
-    border-radius: ${props => props.type === 'user' ? '50%' : '0'};
-
+    
     @media (min-width: 768px) {
       margin-right: var(--spacing-xl);
     }

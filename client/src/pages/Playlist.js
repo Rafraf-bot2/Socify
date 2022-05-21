@@ -15,9 +15,9 @@ const Playlist = () => {
     useEffect(() => {
         const fetchData = async () => {
             const playslist = await getPlaylistByID(id);
-
+            console.log(id)
             setPlaylist(playslist);
-            
+            console.log(playslist)
             if (playslist)
                 setTracks(playslist.tracks.items);
             else
@@ -30,10 +30,9 @@ const Playlist = () => {
         if (tracks)
             return tracks.map(({track}) => track);
     }, [tracks])
-    
     return (
         <>
-            <StyledButton href="/">Home</StyledButton>
+            <StyledButton href="/me">Home</StyledButton>
             <StyledLogoutButton href='http://localhost:8000/logout'>Se déconnecter</StyledLogoutButton>
             {playlist && (
                 <>

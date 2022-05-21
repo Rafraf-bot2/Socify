@@ -5,7 +5,7 @@ const { getUserInfo, getCurrentUserPlaylists, getCurrentUserTopArtists,
         getCurrentUserTopTracks, setCurrentUserPlaylist, fillCurrentUserPlaylist, 
         getUserLastDiscussion, getUserDiscussions, getUserDiscussionMessages, 
         setUserLastDiscussion, getUser, getTArtist, 
-        getTTrack } = require('./modules/user')
+        getTTrack, getOthers } = require('./modules/user')
 
 const express = require('express')
 const cors = require ('cors')
@@ -96,7 +96,7 @@ app.get('/callback', async (req, res) => {
                 await insertUserInDatabase(res, resUser.res, resToken.res, resTopA, resTopT)
         }
     }
-    res.redirect('http://localhost:3000/')
+    res.redirect('http://localhost:3000/me')
 })
 
 app.get('/me', async (req, res) => {
@@ -251,6 +251,52 @@ app.post('/playlists/playlistID', async (req, res) => {
     }
 })
 
+//-----------ENDPOINT FROM DB
+
+app.get('/bd/me/user', async(req, res) => {
+    const userID = req.signedCookies ? req.signedCookies.userID : null
+
+    if(userID) {
+        const response = await getUser(userID)
+        res.json(response)
+    }
+    else {
+        res.json({ error : 'Error man'})
+    }
+})
+
+app.get('/bd/me/top/artist', async (req, res) => {
+    const userID = req.signedCookies ? req.signedCookies.userID : null
+
+    if(userID){
+        if ('time_range' in req.query) {
+            time_range = req.query.time_range
+       } else {
+            time_range = 'short_term'
+       }
+
+        const response = await getTArtist(userID, time_range)
+        res.json(response)
+    } else 
+        res.json({ error : 'Error man'})
+})
+
+app.get('/bd/me/top/track', async (req, res) => {
+    const userID = req.signedCookies ? req.signedCookies.userID : null
+
+    if(userID) {
+        if ('time_range' in req.query) {
+             time_range = req.query.time_range
+        } else {
+             time_range = 'short_term'
+        }
+
+        const response = await getTTrack(userID, time_range)
+        res.json(response)
+    } else 
+        res.json({ error : 'Error man'})
+})
+
 app.get('/bd/user', async(req, res) => {
     if('userID' in req.query) {
         const response = await getUser(req.query.userID)
@@ -293,6 +339,16 @@ app.get('/bd/top/track', async (req, res) => {
         res.json({ error: 'caca'})
     } 
         
+})
+
+app.get('/bd/others', async (req, res) => {
+    const userID = req.signedCookies ? req.signedCookies.userID : null
+
+    if(userID) {
+        const response = await getOthers(userID)
+        res.json(response)
+    } else 
+        res.json({ error: 'Error man'})
 })
 
 app.get('/lastDiscussion', async (req, res) => {

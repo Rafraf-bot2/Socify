@@ -20,7 +20,7 @@ const PlaylistsGrid = ({playlists}) => (
                 ))}
             </StyledGrid>
         ): (
-            <p className='empty_notice'>Pas de playlist à afficher 😔</p>
+            <p className='empty-notice'>Pas de playlist à afficher 😔</p>
         )}
     </>
 );

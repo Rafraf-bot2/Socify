@@ -1,6 +1,6 @@
 const { getLastDiscussionByUserID, getDiscussionsByUserID, getMessagesByDiscussionID, 
         setLastDiscussionByUserID, getTopArtistsFromDB, 
-        getTopTrackFromDB, getUserFromDB  } = require('./database')
+        getTopTrackFromDB, getUserFromDB, getOtherUsersFromDB  } = require('./database')
 
 const axios = require('axios').default
 
@@ -182,8 +182,12 @@ const getTTrack = async(userID, time_range) => {
     return await getTopTrackFromDB(userID, time_range)
 }
 
+const getOthers = async(userID) => {
+    return await getOtherUsersFromDB(userID)
+}
+
 module.exports = { getUserInfo, getCurrentUserPlaylists, getCurrentUserTopArtists, 
                    getCurrentUserTopTracks, setCurrentUserPlaylist, fillCurrentUserPlaylist, 
                    getUserLastDiscussion, getUserDiscussions, getUserDiscussionMessages, 
                    setUserLastDiscussion, getUser, getTArtist, 
-                   getTTrack }
+                   getTTrack, getOthers }

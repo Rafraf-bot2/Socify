@@ -22,7 +22,7 @@ const Playlists = () => {
 
     return (
         <>
-            <StyledButton href="/">Home</StyledButton>
+            <StyledButton href="/me">Home</StyledButton>
             <StyledLogoutButton href='http://localhost:8000/logout'>Se déconnecter</StyledLogoutButton>
             <main>
                 <SectionWrapper title="Playlists" breadcrumb={true}>

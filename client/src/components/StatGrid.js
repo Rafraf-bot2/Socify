@@ -29,7 +29,7 @@ const StatGrid = ({stats}) => (
                        }
                    </StyledGrid>
                ): (
-                <p className='empty_notice'>Pas de stats à afficher 😔</p>
+                <p className='empty-notice'>Pas de stats à afficher 😔</p>
                )}
             </>
 )
