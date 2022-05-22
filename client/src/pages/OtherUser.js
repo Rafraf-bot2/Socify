@@ -1,23 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {getUser, getUserTArtist, getUserTTrack} from '../scripts/database';
+import { logoutCurrentUser } from '../scripts/user';
+import { getUser, getUserTArtist, getUserTTrack} from '../scripts/database';
 import { getTracksAverageStats } from '../scripts/music';
 import { StyledHeader, StyledButton, StyledLogoutButton } from '../styles';
-import { SectionWrapper, ArtistGrid, TrackList, PlaylistsGrid, StatGrid } from '../components';
+import { SectionWrapper, ArtistGrid, TrackList, StatGrid } from '../components';
 import { catchErrors } from '../utils';
 import socifyDefault from '../images/socifyDefault.png'
 
 const OtherUser = () => {
-    const [profile, setProfile] = useState(null);
-    const [playlists, setPlaylists] = useState(null);
     const [stats, setStats] = useState(null);
     const [user, setUser] = useState(null)
     const [tArtist, setTArtist] = useState(null);
     const [tTrack, setTTrack] = useState(null);
 
     const {userID} = useParams();
-
-    console.log(userID);
 
     useEffect(() => {
         /**
@@ -27,15 +24,12 @@ const OtherUser = () => {
         const fetchData = async () => {
             const userInf = await getUser(userID)
             setUser(userInf)
-            console.log(userInf.picture)
             
             const userTArtist = await getUserTArtist(userID)
             setTArtist(userTArtist)
-            console.log(userTArtist)
 
             const userTTrack = await getUserTTrack(userID)
             setTTrack(userTTrack)
-            //console.log((userTTrack[0])[0])
 
             if (userTTrack) {
                 const userStats = await getTracksAverageStats(userTTrack);
@@ -49,7 +43,7 @@ const OtherUser = () => {
     return (
         <>
             <StyledButton href="/dashboard">Rooms</StyledButton>
-            <StyledLogoutButton href="http://localhost:8000/logout">Se déconnecter</StyledLogoutButton>
+            <StyledLogoutButton onClick={logoutCurrentUser}>Se déconnecter</StyledLogoutButton>
             {user && (
                 <>
                     <StyledHeader type="user">
@@ -72,12 +66,9 @@ const OtherUser = () => {
                                 <SectionWrapper title="🔥 Artistes du mois" seeAllLink={"/top-artists/"+userID}>
                                     <ArtistGrid artists={tArtist.slice(0, 5)}/>
                                 </SectionWrapper>
-
                                 <SectionWrapper title="🔥 Sons du mois" seeAllLink={"/top-tracks/"+userID}>
                                     <TrackList tracks={tTrack.slice(0, 5)}/>
                                 </SectionWrapper>
-
-                              
                             </main>
                         )
                     }

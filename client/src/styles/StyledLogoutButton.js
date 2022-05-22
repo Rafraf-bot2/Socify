@@ -1,6 +1,6 @@
 import styled from 'styled-components/macro';
 
-const StyledLogoutButton = styled.a`
+const StyledLogoutButton = styled.button`
     position: absolute;
     top: var(--spacing-sm);
     right: var(--spacing-md);

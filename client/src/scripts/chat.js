@@ -99,11 +99,9 @@ export const searchUsersAndDiscussions = async name => {
     return 'res' in response.data ? response.data.res : null
 }
 
-export const followDiscussionUser = async (userID, name, picture) => {
+export const followDiscussionUser = async (userID) => {
     const response = await axios.post('/followUser', {
-        userID: userID,
-        name: name,
-        picture: picture
+        userID: userID
     })
     return 'res' in response.data ? response.data.res : null
 }

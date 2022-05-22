@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getCurrentUserPlaylists } from '../scripts/user';
+import { getCurrentUserPlaylists, logoutCurrentUser } from '../scripts/user';
 import { SectionWrapper, PlaylistsGrid } from '../components';
 import { catchErrors } from '../utils';
 import { StyledButton, StyledLogoutButton } from '../styles';
@@ -23,7 +23,7 @@ const Playlists = () => {
     return (
         <>
             <StyledButton href="/">Home</StyledButton>
-            <StyledLogoutButton href='http://localhost:8000/logout'>Se déconnecter</StyledLogoutButton>
+            <StyledLogoutButton onClick={logoutCurrentUser}>Se déconnecter</StyledLogoutButton>
             <main>
                 <SectionWrapper title="🎧 Playlists" breadcrumb={true}>
                     {playlists && (

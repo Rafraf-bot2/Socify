@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
+import { logoutCurrentUser } from '../scripts/user';
 import { SectionWrapper, PlaylistTrackList } from '../components';
 import { getPlaylistByID } from '../scripts/music';
 import { StyledHeader, StyledButton, StyledLogoutButton } from '../styles';
@@ -15,9 +16,7 @@ const Playlist = () => {
     useEffect(() => {
         const fetchData = async () => {
             const playslist = await getPlaylistByID(id);
-            console.log(id)
             setPlaylist(playslist);
-            console.log(playslist)
             if (playslist)
                 setTracks(playslist.tracks.items);
             else
@@ -34,7 +33,7 @@ const Playlist = () => {
     return (
         <>
             <StyledButton href="/me">Home</StyledButton>
-            <StyledLogoutButton href='http://localhost:8000/logout'>Se déconnecter</StyledLogoutButton>
+            <StyledLogoutButton onClick={logoutCurrentUser}>Se déconnecter</StyledLogoutButton>
             {playlist && (
                 <>
                     <StyledHeader>

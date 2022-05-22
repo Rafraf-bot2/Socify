@@ -2,8 +2,9 @@ const { createDatabaseIfNotExist, insertUserInDatabase, insertMessageInDiscussio
     getDiscussionsByUserID, getUsersFromName, getDiscussionsFromName,
     getDiscussionNumberOfParticipant, getAllDiscussions, createDiscussion,
     createDiscussionUser, insertFollower, joinDiscussion,
-    getFollow, getdiscussionOwner, getFollowID,
-    getMessagesWaiting, setDiscussionLastView, checkIfUserInDiscussion } = require('./modules/database')
+    getFollow, getDiscussionOwner, getFollowID,
+    getMessagesWaiting, setDiscussionLastView, checkIfUserInDiscussion,
+    getDiscussion, getFollowerDiscussionID } = require('./modules/database')
 
 const { getArtistTopTracks, getTracksInfo, getPlaylistByID } = require('./modules/music')
 const { checkIfTokenIsExpired, getAccessToken } = require('./modules/token')
@@ -67,6 +68,15 @@ app.get('/login', (req, res) => {
     params.set('scope', process.env.SCOPE)
     
     res.redirect('https://accounts.spotify.com/authorize?' + params)
+})
+
+app.get('/logout', async (req, res) => {
+    res.clearCookie('userID')
+    res.clearCookie('access_token')
+    res.clearCookie('refresh_token')
+    res.clearCookie('expireTime')
+
+    res.end()
 })
 
 app.get('/callback', async (req, res) => {
@@ -527,10 +537,15 @@ app.post('/followUser', async (req, res) => {
     const userID = req.signedCookies ? req.signedCookies.userID : null
 
     if (userID && 'userID' in req.body) {
-        const follow = req.body.userID
+        const followID = req.body.userID
 
-        const discussionID = await createDiscussionUser(userID)
-        await insertFollower(userID, follow, discussionID)
+        const discussion = await getFollowerDiscussionID(userID, followID)
+
+        console.log(discussion)
+
+        const discussionID = discussion.length > 0 ? discussion[0].discussionID : await createDiscussionUser(userID)
+
+        await insertFollower(userID, followID, discussionID)
         
         res.json({
             res: discussionID
@@ -594,7 +609,10 @@ app.get('/discussionsTrend', async (req, res) => {
             discussion.online = connectUsers.length
             discussion.members = await getDiscussionNumberOfParticipant(discussion.discussionID)
         }
-        discussions.sort((discussion1, discussion2) => discussion1.members - discussion2.members)
+        discussions.sort((discussion1, discussion2) => discussion2.members - discussion1.members)
+
+        if (discussions.length > 9)
+            discussions.slice(1, 9)
     }
     
     res.json({
@@ -669,12 +687,13 @@ io.on('connection', async socket => {
         if (discussions.res.length > 0) {
             for (const discussion of discussions.res) {
                 socket.join(discussion.discussionID)
+                io.to(discussion.discussionID).emit('updateStatus', {discussionID: discussion.discussionID})
             }
         }
     })
 
     socket.on('sendMessage', async data => {
-        if (await getdiscussionOwner(data.discussionID) === '') {
+        if (await getDiscussionOwner(data.discussionID) === '') {
             const followID = await getFollowID(data.discussionID)
             const discussion = await checkIfUserInDiscussion(followID, data.discussionID)
 
@@ -710,6 +729,7 @@ io.on('connection', async socket => {
 
     socket.on('joinDiscussion', async data => {
         socket.join(data.discussionID)
+        io.to(data.discussionID).emit('updateStatus', {discussionID: data.discussionID})
 
         if (data.type) {
             const message = await insertMessageInDiscussion(data.discussionID, socket.userID, `${data.name} a rejoint la discussion`)
@@ -722,8 +742,12 @@ io.on('connection', async socket => {
         }
     })
 
-    socket.on('leaveDiscussion', data => {
-        socket.leave(data.discussionID)
+    socket.on('disconnect', async () => {
+        const discussions = await getDiscussion(socket.userID)
+
+        if (discussions.length > 0)
+            for (const discussion of discussions)
+                io.to(discussion.discussionID).emit('updateStatus', {discussionID: discussion.discussionID})
     })
 })
 

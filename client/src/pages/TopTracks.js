@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import {getUser, getUserTTrack} from '../scripts/database';
+import { logoutCurrentUser } from '../scripts/user';
+import { getUser, getUserTTrack } from '../scripts/database';
 import { TrackList, SectionWrapper, RangeButton } from '../components';
 import { PlaylistGenButton } from '../components';
 import { catchErrors } from '../utils';
@@ -39,7 +40,7 @@ const TopTracks = () => {
     return(
         <>
             <StyledButton href="/me">Home</StyledButton>
-            <StyledLogoutButton href='http://localhost:8000/logout'>Se déconnecter</StyledLogoutButton>
+            <StyledLogoutButton onClick={logoutCurrentUser}>Se déconnecter</StyledLogoutButton>
             <main>
                 {
                     user && (

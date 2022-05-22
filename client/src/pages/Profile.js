@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import {getCurrentUserPlaylists} from '../scripts/user';
-import {getCurrentUser, getCurrentUserTArtist, getCurrentUserTTrack, getOtherUsers, getFollowedUsers, getFollowerUsers} from '../scripts/database';
+import { getCurrentUserPlaylists, logoutCurrentUser } from '../scripts/user';
+import { getCurrentUser, getCurrentUserTArtist, getCurrentUserTTrack, getOtherUsers, getFollowedUsers, getFollowerUsers } from '../scripts/database';
 import { getTracksAverageStats } from '../scripts/music';
 import { StyledHeader, StyledButton, StyledLogoutButton } from '../styles';
 import { SectionWrapper, ArtistGrid, TrackList, PlaylistsGrid, StatGrid, UserGrid } from '../components';
@@ -31,7 +31,6 @@ const Profile = () => {
             
             const userTArtist = await getCurrentUserTArtist()
             setTArtist(userTArtist)
-            console.log(userTArtist)
 
             const userTTrack = await getCurrentUserTTrack()
             setTTrack(userTTrack)
@@ -43,7 +42,6 @@ const Profile = () => {
             setFollowedInfo(followed)
             
             const follower = await getFollowerUsers();
-            console.log(follower)
             setFollowerInfo(follower)
             
             if (userTTrack && userTTrack[0].length > 0) {
@@ -59,7 +57,7 @@ const Profile = () => {
     return (
         <>
             <StyledButton href="/dashboard">Rooms</StyledButton>
-            <StyledLogoutButton href="http://localhost:8000/logout">Se déconnecter</StyledLogoutButton>
+            <StyledLogoutButton onClick={logoutCurrentUser}>Se déconnecter</StyledLogoutButton>
             {user && (
                 <>
                     <StyledHeader type="user">
@@ -83,9 +81,9 @@ const Profile = () => {
                                     )}
 
                                     {followerInfo && (
-                                    <span>
-                                        {followerInfo.nbrFollower} Follower{followerInfo.nbrFollower > 1 ? 's' : ''}
-                                    </span>
+                                        <span>
+                                            {followerInfo.nbrFollower} Follower{followerInfo.nbrFollower > 1 ? 's' : ''}
+                                        </span>
                                     )}
 
                                 </p>
@@ -98,6 +96,7 @@ const Profile = () => {
                                 <SectionWrapper title="📊 Stats">
                                     <StatGrid stats={stats}/>
                                 </SectionWrapper>
+
                                 <SectionWrapper title="🔥 Artistes du mois" seeAllLink={"/top-artists/"+user.userID}>
                                     <ArtistGrid artists={tArtist.slice(0, 5)}/>
                                 </SectionWrapper>

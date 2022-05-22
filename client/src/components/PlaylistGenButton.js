@@ -37,15 +37,6 @@ const GenereatePlaylistFromArtist = async (profile, items) => {
                 tracksUris.push(topTrack.uri)
         }
     }
-   /* for (const item of items) {
-        const tracks = await getArtistTopTracks(item.id);
-        if (tracks) {
-            const topTracks = tracks.tracks.slice(0, 5);
-
-            for (const topTrack of topTracks) 
-                tracksUris.push(topTrack.uri)
-        }
-    } */
 
     return {playlistName, playlistDesc, tracksUris}
 }

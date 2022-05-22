@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { logoutCurrentUser } from '../scripts/user';
 import { getOtherUsers } from '../scripts/database';
 import { catchErrors } from '../utils';
 import { StyledButton, StyledLogoutButton } from '../styles';
@@ -11,7 +12,6 @@ const Users = () => {
         const fetchData = async () => {
             const others = await getOtherUsers()
             setOtherUSers(others)
-            console.log(others)
         }
 
         catchErrors(fetchData());
@@ -20,7 +20,7 @@ const Users = () => {
     return (
         <>
             <StyledButton href="/me">Home</StyledButton>
-            <StyledLogoutButton href='http://localhost:8000/logout'>Se déconnecter</StyledLogoutButton>
+            <StyledLogoutButton onClick={logoutCurrentUser}>Se déconnecter</StyledLogoutButton>
             <main>
                 <SectionWrapper title ="🧏‍♂️ Utilisateurs">
                     <UserGrid users={otherUsers}/>

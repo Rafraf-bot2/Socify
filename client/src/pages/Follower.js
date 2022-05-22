@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { logoutCurrentUser } from '../scripts/user';
 import { getFollowerUsers } from '../scripts/database';
 import { catchErrors } from '../utils';
 import { StyledButton, StyledLogoutButton } from '../styles';
@@ -10,7 +11,6 @@ const Follower = () => {
     useEffect(() => {
         const fetchData = async () => {
             const follower = await getFollowerUsers()
-            console.log(follower)
             setFollowerUsers(follower)
         }
 
@@ -20,7 +20,7 @@ const Follower = () => {
     return (
         <>
             <StyledButton href="/me">Home</StyledButton>
-            <StyledLogoutButton href='http://localhost:8000/logout'>Se déconnecter</StyledLogoutButton>
+            <StyledLogoutButton onClick={logoutCurrentUser}>Se déconnecter</StyledLogoutButton>
             <main>
                 <SectionWrapper title ="🥵 Follower">
                     {

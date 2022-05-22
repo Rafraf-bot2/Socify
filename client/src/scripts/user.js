@@ -44,5 +44,15 @@ export const fillCurrentUserPlaylist = async (playlistID, tracksUris) => {
 }
 
 export const logoutCurrentUser = async () => {
-    await axios.post('/logout')
+    const windowLogout = window.open('https://spotify.com/logout', 'Déconnexion de Spotify', 'width=400,height=600, resizable=0')
+  
+    setTimeout(function() {
+        windowLogout.close()
+    }, 1000)
+
+    await axios.get('/logout')
+    
+    setTimeout(function() {
+        window.location.href = '/'
+    }, 1000)
 }

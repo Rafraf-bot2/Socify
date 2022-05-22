@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { logoutCurrentUser } from '../scripts/user';
 import { getFollowedUsers } from '../scripts/database';
 import { catchErrors } from '../utils';
 import { StyledButton, StyledLogoutButton } from '../styles';
@@ -10,7 +11,6 @@ const Followed = () => {
     useEffect(() => {
         const fetchData = async () => {
             const followed = await getFollowedUsers()
-            console.log(followed)
             setFollowedUsers(followed)
         }
 
@@ -20,7 +20,7 @@ const Followed = () => {
     return (
         <>
             <StyledButton href="/me">Home</StyledButton>
-            <StyledLogoutButton href='http://localhost:8000/logout'>Se déconnecter</StyledLogoutButton>
+            <StyledLogoutButton onClick={logoutCurrentUser}>Se déconnecter</StyledLogoutButton>
             <main>
                 <SectionWrapper title ="😉 Followed">
                     {
@@ -30,10 +30,7 @@ const Followed = () => {
                     }  
                 </SectionWrapper>
             </main>
-
         </>
-
     )
-
 }
 export default Followed;

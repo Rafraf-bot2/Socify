@@ -51,7 +51,7 @@ const Dashboard = () => {
         return check
     }
 
-    const checkPicture = () => {
+    const checkPicture = async () => {
         const picture = document.getElementById('discussionPicture').value
         let check = true
 
@@ -63,7 +63,18 @@ const Dashboard = () => {
                 setErrorPicture(`L'url doit être une image`)
                 check = check && false
             } else {
-                setErrorPicture(null)
+                const image = new Image()
+                image.src = picture
+                await image.decode()
+                const width = image.width
+                const height = image.height
+
+                if (width !== height) {
+                    setErrorPicture(`L'image doit être carré`)
+                    check = check && false
+                } else {
+                    setErrorPicture(null)
+                }
             }
         }
 
@@ -114,17 +125,17 @@ const Dashboard = () => {
     const followUser = async (e, userID) => {
         e.preventDefault()
 
-        const discussion = await followDiscussionUser(userID)
+        const discussionID = await followDiscussionUser(userID)
 
-        if (discussion) {
+        if (discussionID) {
             setDiscussions(await getCurrentUserDiscussions())
-            setMessages([])
-            setCurrentDiscussion(discussion)
-            await setCurrentUserLastDiscussion(discussion)
+            setMessages(await getCurrentUserDiscussionMessages(discussionID))
+            setCurrentDiscussion(discussionID)
+            await setCurrentUserLastDiscussion(discussionID)
 
             socket.emit('joinDiscussion', {
                 name: profile.display_name,
-                discussionID: discussion,
+                discussionID: discussionID,
                 type: false
             })
         }
@@ -247,6 +258,20 @@ const Dashboard = () => {
     }, [socket, discussions, messagesWaiting])
 
     useEffect(() => {
+        if (socket === null)
+            return
+
+        const updateStatus = async (data) => {
+            if (currentDiscussion === data.discussionID)
+                setUsers(await getDiscussionUsersStatus(data.discussionID))
+        }
+
+        socket.on('updateStatus', updateStatus)
+
+        return () => socket.off('updateStatus')
+    }, [socket, currentDiscussion, users])
+
+    useEffect(() => {
         const fetchData = async () => {
             const userSocket = io('http://localhost:8000', {withCredentials: true})
             setSocket(userSocket)
@@ -344,6 +369,15 @@ const Dashboard = () => {
                 </li>
             </ul>
 
+            <div className='userInfo'>
+                {profile && (
+                    <>
+                        <a href='/me'><img src={profile.images.length > 0 ? profile.images[0].url : socifyDefault} alt='Avatar' className='picture'/></a>
+                        <a href='/me' className='name'>{profile.display_name}</a>
+                    </>
+                )}
+            </div>
+
             {currentDiscussion !== -1 ?
                 <>
                     {messagesWaiting && messagesWaiting.get(currentDiscussion) > 0 && scrollPosition === -1 && (
@@ -371,9 +405,9 @@ const Dashboard = () => {
                                                         <p className='contentMin'>{message.content}</p>
                                                     </>
                                                 :
-                                                    <>
-                                                        <img src={message.picture === '' ? socifyDefault : message.picture} alt='avatar' className='picture'/>
-                                                        <p className='name'>{message.name}</p>
+                                                    <>                                                        
+                                                        <a href={profile.id === message.userID ? '/me' : `/user/${message.userID}`}><img src={message.picture === '' ? socifyDefault : message.picture} alt='avatar' className='picture'/></a>
+                                                        <a href={profile.id === message.userID ? '/me' : `/user/${message.userID}`} className='name'>{message.name}</a>
                                                         <p className='date'>{message.date}</p>
                                                         <p className='content'>{message.content}</p>
                                                     </>
@@ -402,9 +436,8 @@ const Dashboard = () => {
                                             <p className='usersStatus'>{`En ligne - ${users.connected.length}`}</p>
                                             {users.connected.map((user, i) => (
                                                 <li key={i}>
-                                                    <img src={user.picture === '' ? socifyDefault : user.picture} alt='avatar' className='picture'/>
-                                                    <p className='name'>{user.name}</p>
-                                                    <p className='date'>{user.date}</p>
+                                                    <a href={profile.id === user.userID ? '/me' : `/user/${user.userID}`}><img src={user.picture === '' ? socifyDefault : user.picture} alt='avatar' className='picture'/></a>
+                                                    <a href={profile.id === user.userID ? '/me' : `/user/${user.userID}`} className='name'>{user.name}</a>
                                                 </li>
                                             ))}
                                         </>
@@ -414,9 +447,8 @@ const Dashboard = () => {
                                             <p className='usersStatus'>{`Hors ligne - ${users.disconnected.length}`}</p>
                                             {users.disconnected.map((user, i) => (
                                                 <li key={i}>
-                                                    <img src={user.picture === '' ? socifyDefault : user.picture} alt='avatar' className='picture'/>
-                                                    <p className='name'>{user.name}</p>
-                                                    <p className='date'>{user.date}</p>
+                                                    <a href={profile.id === user.userID ? '/me' : `/user/${user.userID}`}><img src={user.picture === '' ? socifyDefault : user.picture} alt='avatar' className='picture'/></a>
+                                                    <a href={profile.id === user.userID ? '/me' : `/user/${user.userID}`} className='name'>{user.name}</a>
                                                 </li>
                                             ))}
                                         </>

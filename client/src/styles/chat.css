@@ -65,7 +65,7 @@
 .discussionsList {
     position: absolute;
     top: 10%;
-    bottom: 0;
+    bottom: 15%;
     left: 0;
     right: 85%;
     width: 15%;
@@ -138,6 +138,47 @@
     font-size: 100%;
     background-color: #ff0000;
     border-radius: 40px;
+}
+
+.userInfo:before {
+    border-bottom: 2px solid #000;
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 80%;
+    bottom: 100%;
+    margin: 0 auto;
+}
+
+.userInfo {
+    display: inline-block;
+    position: absolute;
+    top: 94%;
+    bottom: 0;
+    left: 0;
+    right: 85%;
+    background-color: #272525;
+    border-right: 1px solid #000;
+}
+
+.userInfo .picture {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    max-width: 18%;
+    border-radius: 50%;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    margin-left: 2%;
+    cursor: pointer;
+}
+
+.userInfo .name {
+    display: inline-block;
+    margin-left: 8%;
+    font-size: 0.8vw;
+    cursor: pointer;
 }
 
 .messagesList {
@@ -407,6 +448,7 @@
     left: 0;
     margin-top: 2%;
     margin-left: 4%;
+    margin-bottom: 1%;
     width: auto;
     height: auto;
     max-width: 13%;
